@@ -132,6 +132,10 @@ When triggered by **LLM Council** Cursor Automation (webhook or manual run), par
 
 `members` overrides preset. Follow the same phases; post ruling to automation output.
 
+## Claude Code
+
+Separate install — not this skill. Claude Code uses `.claude/skills/llm-council/` and `claude/presets/` with **opus/sonnet/haiku only** (no GPT/Gemini). See [claude/README.md](../../../claude/README.md).
+
 ## Don't
 
 - No npm, no CURSOR_API_KEY, no repo edits during council (unless asked).
