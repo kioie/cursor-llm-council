@@ -1,8 +1,7 @@
 id: your-member-id
 name: Alex
 title: Your Title
-model: composer-2.5-fast   # swap for any model your Cursor plan supports
+model: composer-2.5-fast   # any Cursor model slug
 persona: >
-  One paragraph: how this person thinks, what they optimize for,
-  and what they push back on in deliberations.
-# chair: true   # uncomment for exactly one chair per roster
+  How this seat thinks and what they push back on.
+# chair: true

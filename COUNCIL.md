@@ -1,40 +1,28 @@
-# LLM Council
+# Cursor LLM Council
 
-> **Start here.** `@COUNCIL.md` in Cursor chat, or:
+> `@COUNCIL.md` in Cursor chat, or:
 >
 > ```
 > council: <your question>
 > ```
 
+Multi-provider models (Claude + GPT + Gemini + …). Claude Code → [claude-llm-council](https://github.com/kioie/claude-llm-council).
+
+## Examples
+
+```
+council: Should we migrate auth to passkeys before GA?
+council @security: expose admin API without VPN?
+council quick: GraphQL or tRPC?
+council engineer=gpt-5.2 "ship dark mode?"
+```
+
 ## Presets
 
-```
-council: …                    # engineering (default)
-council @product: …
-council @security: …
-council @minimal: …           # fastest
-```
+`engineering` (default) · `product` · `security` · `minimal`
 
-## Members
+Roster: `.cursor-llm-council/roster.yaml` — see [members/README.md](members/README.md)
 
-```
-council roster                 # show current seats
-council roster: create member  # add a custom seat
-```
+## Automations
 
-Local config: `.llm-council/roster.yaml` (see [members/README.md](members/README.md))
-
-## Modes
-
-```
-council quick: …    # opinions only
-council deep: …     # two deliberation rounds
-```
-
-## Automation
-
-Webhook + PR triggers → [automations/README.md](automations/README.md)
-
-## Claude Code
-
-[claude/COUNCIL.md](claude/COUNCIL.md)
+[automations/README.md](automations/README.md)

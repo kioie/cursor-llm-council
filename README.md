@@ -1,44 +1,33 @@
-# LLM Council
+# Cursor LLM Council
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Multi-model deliberation for developers** — in Cursor chat, Claude Code, or via Cursor Automations.
+**Multi-provider deliberation for Cursor** — parallel Task subagents on Claude, GPT, Gemini, Composer, and more. Vote. Rule. Ship.
 
-Five (or fewer) council seats debate your question in parallel, vote, and produce a binding ruling. No SDK. No API keys. No `npm install`.
-
-> **Cursor vs Claude Code:** Cursor runs **multiple providers** per council (Claude + GPT + Gemini + …). Claude Code runs **Claude tiers only** (opus / sonnet / haiku) — same personas and workflow, different model surface. See [claude/README.md](claude/README.md).
+Built for Cursor only. Using Claude Code? See **[claude-llm-council](https://github.com/kioie/claude-llm-council)**.
 
 ```
 council: Should we ship feature X this sprint?
 council @security: Expose the admin API without VPN?
 ```
 
+No SDK. No API keys beyond Cursor. No `npm install`.
+
 ## Quick start
 
 ```bash
-git clone https://github.com/kioie/llm-council.git
-cd llm-council
-./install.sh          # Cursor (default)
-./install.sh --claude # Claude Code
-./install.sh --all    # both
+git clone https://github.com/kioie/cursor-llm-council.git
+cd cursor-llm-council
+./install.sh
 ```
 
-### Cursor
+In any project:
 
 ```
 council: Migrate to passkeys before GA?
 ```
 
-Or `@COUNCIL.md` + your question. Models: any provider your Cursor plan supports (`presets/`).
-
-### Claude Code
-
-```bash
-claude   # in your project
-/llm-council Migrate to passkeys before GA?
-```
-
-Models: `opus` | `sonnet` | `haiku` only (`claude/presets/`). Full guide: [claude/README.md](claude/README.md).
+Or `@COUNCIL.md` + your question.
 
 ---
 
@@ -52,189 +41,115 @@ Models: `opus` | `sonnet` | `haiku` only (`claude/presets/`). Full guide: [claud
 - id: architect
   name: Elena
   title: Systems Architect
-  model: claude-4.6-opus-high-thinking   # model for this seat
+  model: claude-4.6-opus-high-thinking
   persona: >
     Systems thinker. Coupling, ops risk, scalability…
 ```
 
-At runtime, the orchestrator spawns **one parallel subagent per seat**, using that seat's `model` and `persona`.
-
-- **Cursor:** Elena on Opus, Marcus on Codex, Priya on Gemini — true multi-provider council.
-- **Claude Code:** same personas, but `model` must be `opus`, `sonnet`, or `haiku` — see `claude/presets/`.
+At runtime, Cursor spawns **one parallel Task subagent per seat** on that seat's model. Elena on Opus, Marcus on Codex, Priya on Gemini — a true **multi-provider** council.
 
 ### Who picks the model?
 
-**You do** — but only from models your Cursor plan supports. Presets ship with suggested defaults; change them anytime in YAML or inline in chat. If a model fails, the skill retries once with `composer-2.5-fast`.
+**You do** — from any model your Cursor plan supports. Presets ship suggested defaults; swap in YAML or inline. On failure, the skill retries once with `composer-2.5-fast`.
 
-### How the roster is chosen (priority order)
+### Roster priority
 
-| Priority | Source | When |
-|----------|--------|------|
-| 1 | Webhook / automation JSON | `members[]` or `preset` in POST body |
-| 2 | `.llm-council/roster.yaml` | Your local config (gitignored, per project) |
-| 3 | Built-in preset | `presets/engineering.yaml` if nothing else is set |
+| Priority | Source |
+|----------|--------|
+| 1 | Webhook / automation JSON (`members[]` or `preset`) |
+| 2 | `.cursor-llm-council/roster.yaml` (local, gitignored) |
+| 3 | `presets/engineering.yaml` (default) |
 
-### Three ways to configure seats
+### Configure seats
 
-**A. Use a preset (easiest)** — pick a council *type*; seats and default models are pre-bundled:
-
-```
-council: Should we ship X?              # engineering (default)
-council @security: Expose admin API?    # security council
-council @minimal: GraphQL or tRPC?      # 4 seats, fastest
-```
+**Presets:**
 
 | Preset | Command | Seats |
 |--------|---------|-------|
 | Engineering (default) | `council: …` | Architect, Engineer, Strategist, Pragmatist, Chair |
 | Product | `council @product: …` | PM, Design, Growth, Eng liaison, Chair |
 | Security | `council @security: …` | AppSec, Infra, Privacy, Pragmatist, Chair |
-| Minimal (fast) | `council @minimal: …` | Builder, Skeptic, User advocate, Chair |
+| Minimal | `council @minimal: …` | Builder, Skeptic, User advocate, Chair |
 
-**B. Swap models inline (one session)** — override a seat without editing files:
+**Inline model swap:**
 
 ```
 council engineer=gpt-5.2 chair=claude-4.6-opus-high-thinking "GraphQL or tRPC?"
 ```
 
-**C. Create your own members (permanent)** — define seats in `.llm-council/`:
+**Custom members:**
 
 ```bash
-mkdir -p .llm-council/members
-cp members/member.example.yaml .llm-council/members/alex.yaml
-# edit name, title, model, persona — then add ref to .llm-council/roster.yaml
+mkdir -p .cursor-llm-council/members
+cp members/member.example.yaml .cursor-llm-council/members/alex.yaml
 ```
 
-Or in chat: `council roster: create member` — the agent asks for name, title, persona, model, and chair yes/no, then writes the files.
+Or: `council roster: create member` — see [members/README.md](members/README.md).
 
-See [members/README.md](members/README.md) for the full member schema.
+### Chair
 
-### The Chair
+Exactly one `chair: true` seat synthesizes the final ruling (Phase 3).
 
-Exactly **one** seat has `chair: true`. That seat:
-
-- Runs the **final synthesis** (Phase 3) after deliberation and voting
-- Can use a **different model** than other seats (e.g. a stronger model for the ruling doc)
-
-If no chair is marked, the last seat in the roster becomes chair.
-
-### What happens when you ask a question
+### Runtime
 
 ```
-You provide:  question (+ optional preset / member overrides)
-Each seat:    persona + model → parallel subagent
-Phase 1:      independent deliberation (all seats in parallel)
-Phase 2:      ballots — each seat reviews full transcript, votes support/oppose/abstain
-Phase 3:      Chair writes binding ruling + vote tally
+Question → parallel deliberation → ballots → chair ruling
 ```
 
-Skip Phase 2 with `council quick: …` (opinions → short ruling only).
+`council quick: …` skips ballots.
 
 ---
 
 ## Modes
 
-| Mode | Command | What runs |
-|------|---------|-----------|
-| Quick | `council quick: …` | Opinions → short ruling |
-| Full | `council: …` | Deliberate → vote → ruling |
-| Deep | `council deep: …` | Two deliberation rounds → vote → ruling |
+| Mode | Command |
+|------|---------|
+| Quick | `council quick: …` |
+| Full | `council: …` |
+| Deep | `council deep: …` |
 
 ---
 
-## Cursor Automation
+## Cursor Automations
 
-Run council from a webhook or the Automations UI — no chat required.
+Webhook or manual run — no chat required.
 
 ```bash
 ./install.sh --automation
 ```
 
-Import [automations/llm-council-webhook.workflow.json](automations/llm-council-webhook.workflow.json) in **Cursor → Automations**, or ask your agent to open it.
-
-**POST after save** — `preset` picks the council; `members` overrides it entirely:
+Import [automations/cursor-llm-council-webhook.workflow.json](automations/cursor-llm-council-webhook.workflow.json).
 
 ```bash
 curl -X POST "$WEBHOOK_URL" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "question": "Adopt event sourcing for billing?",
-    "preset": "engineering",
-    "mode": "full"
-  }'
+  -d '{"question": "Adopt event sourcing?", "preset": "engineering", "mode": "full"}'
 ```
 
-**Custom members in webhook** (overrides preset):
-
-```json
-{
-  "question": "Ship dark mode in v2?",
-  "members": [
-    {
-      "name": "Alex",
-      "title": "Design Lead",
-      "model": "gemini-3.5-flash",
-      "persona": "UX and accessibility first."
-    },
-    {
-      "name": "Sam",
-      "title": "Chair",
-      "model": "claude-4.6-opus-high-thinking",
-      "persona": "Synthesizes binding rulings.",
-      "chair": true
-    }
-  ]
-}
-```
-
-**PR review** — comment `/council` on a PR using [automations/llm-council-pr.workflow.json](automations/llm-council-pr.workflow.json).
+**PR review:** comment `/council` — [automations/cursor-llm-council-pr.workflow.json](automations/cursor-llm-council-pr.workflow.json).
 
 Details: [automations/README.md](automations/README.md)
-
----
-
-## Claude Code
-
-Dedicated skill at `.claude/skills/llm-council/`, Claude-native presets at `claude/presets/`, parallel Agent subagents.
-
-| Topic | Doc |
-|-------|-----|
-| Install + quick start | [claude/COUNCIL.md](claude/COUNCIL.md) |
-| Cursor vs Claude parity | [claude/README.md](claude/README.md) |
 
 ---
 
 ## Project layout
 
 ```
-.cursor/skills/llm-council/   # Cursor skill
-.claude/skills/llm-council/   # Claude Code skill
-COUNCIL.md                    # Cursor @-mention entry point
-claude/COUNCIL.md             # Claude Code entry point
-presets/                      # Cursor presets (multi-provider models)
-claude/presets/               # Claude presets (opus/sonnet/haiku)
-members/                      # create-your-own member templates
-templates/                    # shared deliberation, ballot, ruling prompts
-automations/                  # Cursor Automation workflow JSON
-.llm-council/                 # your local roster (gitignored)
+.cursor/skills/cursor-llm-council/   # Cursor skill
+COUNCIL.md                           # @-mention entry point
+presets/                             # multi-provider model presets
+members/                             # custom seat templates
+templates/                           # deliberation, ballot, ruling
+automations/                         # Cursor Automation JSON
+.cursor-llm-council/                 # your local roster (gitignored)
 ```
-
----
-
-## Why
-
-| You need | LLM Council gives you |
-|----------|------------------------|
-| A second opinion | Five, from different models |
-| A decision record | Chair ruling + vote tally |
-| Low friction | One line in chat, or a webhook POST |
 
 ---
 
 ## Contributing
 
-PRs welcome — especially new presets and automation triggers. See [CONTRIBUTING.md](CONTRIBUTING.md).
+PRs welcome — presets, automations, prompt tweaks. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

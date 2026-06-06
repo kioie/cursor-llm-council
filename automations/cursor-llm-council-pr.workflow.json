@@ -1,0 +1,21 @@
+{
+  "name": "Cursor LLM Council — PR Review",
+  "description": "Comment /council on a PR to get a multi-model merge ruling.",
+  "workflow": {
+    "triggers": [{
+      "git": {
+        "pullRequest": {
+          "action": "GIT_PULL_REQUEST_ACTION_COMMENTED",
+          "ignoreDraftPrs": true
+        }
+      }
+    }],
+    "actions": [{ "prComment": {} }],
+    "prompts": [{
+      "prompt": "Cursor LLM Council PR review. If comment contains /council, convene engineering preset council on \"Should we merge this PR?\" with PR context. Follow cursor-llm-council skill: Task subagents → ballots → chair ruling. Post concise PR comment with <details> for full transcript."
+    }],
+    "model": "",
+    "agentOptions": { "skipInstall": false },
+    "memoryEnabled": false
+  }
+}

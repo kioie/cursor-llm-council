@@ -1,0 +1,14 @@
+{
+  "name": "Cursor LLM Council",
+  "description": "Multi-provider council on any question. POST JSON to webhook after save, or run manually.",
+  "workflow": {
+    "triggers": [{ "webhook": {} }],
+    "actions": [],
+    "prompts": [{
+      "prompt": "You are the Cursor LLM Council orchestrator. Follow the cursor-llm-council skill.\n\nParse webhook JSON (or ask on manual run):\n- question (required), context, mode (full|quick|deep), preset (engineering|product|security|minimal)\n- members[] optional — overrides preset; each needs name, title, model (Cursor slug), persona; one chair: true\n\nRoster priority: payload members → .cursor-llm-council/roster.yaml → presets/<preset>.yaml\n\nRun: parallel Task subagents per seat (generalPurpose, readonly, each member's model) → templates/deliberation.md → ballots (unless quick) → chair ruling → templates/ruling.md.\n\nSave to council-rulings/ when worth keeping. No code edits unless question requires it."
+    }],
+    "model": "",
+    "agentOptions": { "skipInstall": false },
+    "memoryEnabled": true
+  }
+}
