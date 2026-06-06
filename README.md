@@ -4,28 +4,41 @@
 
 **Multi-model deliberation for developers** — in Cursor chat, Claude Code, or via Cursor Automations.
 
-Five (or fewer) models debate your question in parallel, vote, and produce a binding ruling. No SDK. No API keys. No `npm install`.
+Five (or fewer) council seats debate your question in parallel, vote, and produce a binding ruling. No SDK. No API keys. No `npm install`.
+
+> **Cursor vs Claude Code:** Cursor runs **multiple providers** per council (Claude + GPT + Gemini + …). Claude Code runs **Claude tiers only** (opus / sonnet / haiku) — same personas and workflow, different model surface. See [claude/README.md](claude/README.md).
 
 ```
 council: Should we ship feature X this sprint?
 council @security: Expose the admin API without VPN?
 ```
 
-## Quick start (Cursor)
+## Quick start
 
 ```bash
 git clone https://github.com/kioie/llm-council.git
 cd llm-council
-./install.sh
+./install.sh          # Cursor (default)
+./install.sh --claude # Claude Code
+./install.sh --all    # both
 ```
 
-Then in any project:
+### Cursor
 
 ```
 council: Migrate to passkeys before GA?
 ```
 
-Or `@COUNCIL.md` + your question.
+Or `@COUNCIL.md` + your question. Models: any provider your Cursor plan supports (`presets/`).
+
+### Claude Code
+
+```bash
+claude   # in your project
+/llm-council Migrate to passkeys before GA?
+```
+
+Models: `opus` | `sonnet` | `haiku` only (`claude/presets/`). Full guide: [claude/README.md](claude/README.md).
 
 ---
 
@@ -44,7 +57,10 @@ Or `@COUNCIL.md` + your question.
     Systems thinker. Coupling, ops risk, scalability…
 ```
 
-At runtime, Cursor spawns **one parallel subagent per seat**, using that seat's `model` and `persona`. Elena always runs on Opus as the architect; Marcus runs on Codex as the engineer — different models, different voices.
+At runtime, the orchestrator spawns **one parallel subagent per seat**, using that seat's `model` and `persona`.
+
+- **Cursor:** Elena on Opus, Marcus on Codex, Priya on Gemini — true multi-provider council.
+- **Claude Code:** same personas, but `model` must be `opus`, `sonnet`, or `haiku` — see `claude/presets/`.
 
 ### Who picks the model?
 
@@ -180,18 +196,26 @@ Details: [automations/README.md](automations/README.md)
 
 ## Claude Code
 
-Same templates and roster format; no parallel Task subagents. See [claude/COUNCIL.md](claude/COUNCIL.md).
+Dedicated skill at `.claude/skills/llm-council/`, Claude-native presets at `claude/presets/`, parallel Agent subagents.
+
+| Topic | Doc |
+|-------|-----|
+| Install + quick start | [claude/COUNCIL.md](claude/COUNCIL.md) |
+| Cursor vs Claude parity | [claude/README.md](claude/README.md) |
 
 ---
 
 ## Project layout
 
 ```
-.cursor/skills/llm-council/   # Cursor skill (orchestration)
-COUNCIL.md                    # @-mention entry point
-presets/                      # engineering, product, security, minimal
+.cursor/skills/llm-council/   # Cursor skill
+.claude/skills/llm-council/   # Claude Code skill
+COUNCIL.md                    # Cursor @-mention entry point
+claude/COUNCIL.md             # Claude Code entry point
+presets/                      # Cursor presets (multi-provider models)
+claude/presets/               # Claude presets (opus/sonnet/haiku)
 members/                      # create-your-own member templates
-templates/                    # deliberation, ballot, ruling prompts
+templates/                    # shared deliberation, ballot, ruling prompts
 automations/                  # Cursor Automation workflow JSON
 .llm-council/                 # your local roster (gitignored)
 ```

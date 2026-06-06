@@ -37,7 +37,7 @@ members:
 | `id` | yes | Slug, unique in roster |
 | `name` | yes | Display name |
 | `title` | yes | Role on the council |
-| `model` | yes | Cursor model slug — use models your plan supports |
+| `model` | yes | **Cursor:** any model slug your plan supports. **Claude Code:** `opus`, `sonnet`, or `haiku` |
 | `persona` | yes | How this member thinks and argues |
 | `chair` | no | Exactly one member should have `chair: true` |
 

@@ -1,29 +1,34 @@
 # LLM Council (Claude Code)
 
-Same council workflow — pick a preset, create members, deliberate, vote, rule.
+> **Start:** `/llm-council <question>` or paste:
+>
+> ```
+> council: <your question>
+> ```
 
-## Start
-
-```
-Convene an LLM Council on: <YOUR QUESTION>
-
-Preset: engineering (or product | security | minimal)
-Read presets/<preset>.yaml from the llm-council repo for member personas.
-Run each member as a separate analysis, then ballots, then Chair ruling.
-Use templates/ruling.md for output format.
-```
-
-## Custom members
-
-Create `members/your-name.yaml` (see `members/member.example.yaml`) or pass inline:
+## Presets
 
 ```
-Members:
-- Alex (Design Lead, opus): UX and a11y first
-- Sam (Chair, sonnet): binding rulings
-Question: Ship dark mode in v2?
+/llm-council Should we ship X?           # engineering
+council @product: Launch freemium?
+council @security: Admin API without VPN?
+council @minimal: GraphQL or tRPC?        # fastest
 ```
 
-## Cursor users
+Presets use **Claude models only** (`opus` / `sonnet` / `haiku`). See [claude/README.md](README.md) for Cursor vs Claude differences.
 
-Use `@COUNCIL.md` or the **llm-council** skill — parallel subagents are faster. Webhook automation: [automations/README.md](../automations/README.md).
+## Members
+
+```
+council roster: create member
+```
+
+Local config: `.llm-council/roster.yaml` — use `model: opus|sonnet|haiku` in member files.
+
+## Install
+
+```bash
+./install.sh --claude
+```
+
+Full docs: [claude/README.md](README.md)

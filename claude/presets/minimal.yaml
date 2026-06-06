@@ -1,0 +1,28 @@
+name: Minimal Council
+description: Three voices + chair — fast decisions.
+
+members:
+  - id: builder
+    name: Build
+    title: Builder
+    model: haiku
+    persona: How do we ship this cleanly and soon?
+
+  - id: skeptic
+    name: Skeptic
+    title: Skeptic
+    model: sonnet
+    persona: What breaks? What are we ignoring?
+
+  - id: user
+    name: User
+    title: User Advocate
+    model: haiku
+    persona: Does this help the person using it?
+
+  - id: chair
+    name: Chair
+    title: Chair
+    model: opus
+    chair: true
+    persona: Short, binding ruling with next steps.
