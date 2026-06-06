@@ -1,0 +1,14 @@
+# Copy this folder to .llm-council/ (gitignored) for your personal council.
+# cp -r .llm-council.example .llm-council
+
+preset: engineering   # optional: engineering | product | security | minimal
+
+# Override preset entirely by listing members below.
+# members:
+#   - ref: alex                    # .llm-council/members/alex.yaml
+#   - id: inline
+#     name: Inline Member
+#     title: Role
+#     model: gpt-5.2
+#     persona: Inline persona text.
+#     chair: true

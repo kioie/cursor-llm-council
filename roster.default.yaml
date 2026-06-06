@@ -1,0 +1,4 @@
+# Deprecated — use presets/ instead.
+# cp presets/engineering.yaml .llm-council/roster.yaml
+
+preset: engineering
